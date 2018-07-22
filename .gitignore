@@ -1,0 +1,11 @@
+.DS_Store
+node_modules
+server/public
+built-config
+log
+/coverage-output
+*.log
+*.iml
+.idea
+*.map
+.vscode/*

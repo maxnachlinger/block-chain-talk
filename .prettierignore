@@ -1,0 +1,7 @@
+built-config/
+server/public/
+*.styl
+*.log
+*.png
+*.html
+.DS_Store
