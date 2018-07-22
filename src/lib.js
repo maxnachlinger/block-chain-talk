@@ -122,17 +122,34 @@ const addTransactionsToBlock = ({ block, transactions }) => {
 
 const getLatestBlockTransaction = (block) => block.transactions[block.transactions.length - 1];
 
-const blockChain = () => [genesisBlock()];
+const hashBlockChain = ({ blocks, index }) => {
+  return hashObject({ blocks, index });
+};
+
+const blockChain = () => {
+  const ret = { blocks: [genesisBlock()], index: 0 };
+  return {
+    ...ret,
+    hash: hashBlockChain(ret)
+  };
+};
 
 const addBlockToChain = ({ chain, block }) => {
   if (!blockIsValid(block)) {
     throw new Error('Invalid block.');
   }
 
-  return chain.concat([block]);
+  chain.blocks.push(block);
+  chain.index = chain.blocks.length - 1;
+  chain.hash = hashBlockChain(chain);
+  return chain;
 };
 
-const getLatestBlock = (chain) => chain[chain.length - 1];
+const getLatestBlock = (chain) => chain.blocks[chain.index];
+
+const chainIsValid = (chain) => {
+  return hashBlockChain(chain) === chain.hash;
+};
 
 module.exports = {
   transaction,
@@ -144,4 +161,5 @@ module.exports = {
   addBlockToChain,
   transactionIsValid,
   blockIsValid,
+  chainIsValid,
 };

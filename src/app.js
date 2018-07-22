@@ -9,6 +9,9 @@ const {
   getLatestBlockTransaction,
   getLatestBlock,
   addBlockToChain,
+  transactionIsValid,
+  blockIsValid,
+  chainIsValid,
 } = require('./lib');
 
 const writeFile = promisify(fs.writeFile);
@@ -58,15 +61,24 @@ const createCakeBlockChain = () => {
     },
   });
 
+  console.log('configureCake is valid:', transactionIsValid(configureCake));
+  console.log('reserveCakeSlot is valid:', transactionIsValid(reserveCakeSlot));
+  console.log('orderCake is valid:', transactionIsValid(orderCake));
+
   const updatedCakeBlock = addTransactionsToBlock({
     block: cakeBlock,
     transactions: [configureCake, reserveCakeSlot, orderCake],
   });
 
+  console.log('updatedCakeBlock is valid:', blockIsValid(updatedCakeBlock));
+
   const updatedCakeBlockChain = addBlockToChain({
     chain: cakeBlockChain,
     block: updatedCakeBlock,
   });
+
+  console.log('updatedCakeBlockChain is valid:', chainIsValid(updatedCakeBlockChain));
+
   return updatedCakeBlockChain;
 };
 
