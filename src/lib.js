@@ -13,6 +13,7 @@ const addHashToTransaction = (transaction) => ({
 
 const transaction = ({ previousTransaction, creator, data }) => {
   return addHashToTransaction({
+    id: uuidv4(),
     index: previousTransaction.index + 1,
     timestamp: Date.now(),
     creator,
@@ -23,6 +24,7 @@ const transaction = ({ previousTransaction, creator, data }) => {
 
 const genesisTransaction = () => {
   return addHashToTransaction({
+    id: uuidv4(),
     index: 0,
     timestamp: Date.now(),
     creator: systemName,
@@ -32,9 +34,10 @@ const genesisTransaction = () => {
 };
 
 const transactionIsValid = (transaction) => {
-  const { hash: existingHash, index, timestamp, creator, data, previousHash } = transaction;
+  const { hash: existingHash, id, index, timestamp, creator, data, previousHash } = transaction;
   return (
     hashObject({
+      id,
       index,
       timestamp,
       creator,
@@ -86,6 +89,7 @@ const mineBlock = (block) => {
 
 const block = (previousBlock) => {
   return mineBlock({
+    id: uuidv4(),
     index: previousBlock.index + 1,
     timestamp: Date.now(),
     previousHash: previousBlock.hash,
@@ -93,7 +97,7 @@ const block = (previousBlock) => {
   });
 };
 
-const genesisBlock = () => block({ index: -1, hash: '0' });
+const genesisBlock = () => block({ index: -1, hash: '0', id: uuidv4() });
 
 const blockIsValid = (block) => {
   return (
