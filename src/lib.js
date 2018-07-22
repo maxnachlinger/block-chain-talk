@@ -51,7 +51,7 @@ const getBlockTransactionsHash = (block) => {
   return merkleTools.getMerkleRoot().toString('hex');
 };
 
-const blockHashDifficulty = 2;
+const blockHashDifficulty = 4;
 const blockHashLeadingCharacter = '0';
 
 const generatedBlockHashIsAcceptable = (hash) => {
@@ -61,13 +61,7 @@ const generatedBlockHashIsAcceptable = (hash) => {
 const getBlockHashAndNonce = (block) => {
   const keysToIgnore = { hash: true, nonce: true };
   const localBlock = Object.keys(block).reduce(
-    (acc, key) =>
-      keysToIgnore[key]
-        ? acc
-        : {
-            ...acc,
-            [key]: block[key],
-          },
+    (acc, key) => (keysToIgnore[key] ? acc : { ...acc, [key]: block[key] }),
     { nonce: 0 },
   );
 
@@ -82,7 +76,7 @@ const getBlockHashAndNonce = (block) => {
   return { nonce: localBlock.nonce, hash };
 };
 
-const mine = (block) => {
+const mineBlock = (block) => {
   const localBlock = {
     ...block,
     transactionsHash: getBlockTransactionsHash(block),
@@ -91,7 +85,7 @@ const mine = (block) => {
 };
 
 const block = (previousBlock) => {
-  return mine({
+  return mineBlock({
     index: previousBlock.index + 1,
     timestamp: Date.now(),
     previousHash: previousBlock.hash,
@@ -99,12 +93,7 @@ const block = (previousBlock) => {
   });
 };
 
-const genesisBlock = () => {
-  return block({
-    index: -1,
-    hash: '0',
-  });
-};
+const genesisBlock = () => block({ index: -1, hash: '0' });
 
 const blockIsValid = (block) => {
   return (
@@ -123,7 +112,7 @@ const addTransactionsToBlock = ({ block, transactions }) => {
     throw new Error('Invalid transactions found.');
   }
 
-  return mine({
+  return mineBlock({
     index,
     timestamp,
     previousHash,
