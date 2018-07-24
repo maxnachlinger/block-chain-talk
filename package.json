@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fastify": "^1.9.0",
     "js-sha3": "^0.7.0",
+    "make-promises-safe": "^1.1.0",
     "merkle-tools": "^1.4.0",
     "uuid": "^3.3.2"
   },
