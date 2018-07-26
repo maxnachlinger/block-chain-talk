@@ -1,7 +1,7 @@
 const { promisify } = require('util');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
-const requireText = require('require-text');
+const requireText = (name) => fs.readFileSync(require.resolve(name), 'utf8').toString();
 
 const {
   block,
@@ -16,9 +16,9 @@ const {
   chainIsValid,
 } = require('./lib');
 
-const publicKey = requireText('../keys/test-key.pub', require);
+const publicKey = requireText('../keys/test-key.pub');
 const privateKey = {
-  key: requireText('../keys/test-key', require),
+  key: requireText('../keys/test-key'),
   passphrase: 'block-chain-test',
 };
 

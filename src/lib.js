@@ -1,15 +1,16 @@
+const fs = require('fs');
 const crypto = require('crypto');
 const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const sha3256 = require('js-sha3').sha3_256;
 const MerkleTools = require('merkle-tools');
-const requireText = require('require-text');
+const requireText = (name) => fs.readFileSync(require.resolve(name), 'utf8').toString();
 
 const systemPrivateKey = {
-  key: requireText('../keys/test-key', require),
+  key: requireText('../keys/test-key'),
   passphrase: 'block-chain-test',
 };
-const systemPublicKey = { key: requireText('../keys/test-key.pub', require) };
+const systemPublicKey = { key: requireText('../keys/test-key.pub') };
 
 const hashObject = (o) => sha3256(JSON.stringify(o));
 

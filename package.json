@@ -14,7 +14,6 @@
     "lodash": "^4.17.10",
     "make-promises-safe": "^1.1.0",
     "merkle-tools": "^1.4.0",
-    "require-text": "0.0.1",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
