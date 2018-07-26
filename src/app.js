@@ -1,6 +1,8 @@
 const { promisify } = require('util');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
+const requireText = require('require-text');
+
 const {
   block,
   transaction,
@@ -14,17 +16,20 @@ const {
   chainIsValid,
 } = require('./lib');
 
+const publicKey = requireText('../keys/test-key.pub', require);
+const privateKey = {
+  key: requireText('../keys/test-key', require),
+  passphrase: 'block-chain-test',
+};
+
 const writeFile = promisify(fs.writeFile);
 
 const createCakeBlockChain = () => {
-  const userId = uuidv4();
-
   const cakeBlockChain = blockChain();
-  const cakeBlock = block(getLatestBlock(cakeBlockChain));
+  const cakeBlock = block(getLatestBlock(cakeBlockChain), privateKey, publicKey);
 
   const configureCake = transaction({
     previousTransaction: getLatestBlockTransaction(cakeBlock),
-    creator: userId,
     data: {
       size: 'quarter-sheet',
       flavor: 'chocolate',
@@ -45,7 +50,6 @@ const createCakeBlockChain = () => {
 
   const reserveCakeSlot = transaction({
     previousTransaction: configureCake,
-    creator: userId,
     data: {
       reservationId: uuidv4(),
       pickupDate: 1532131200000,
@@ -55,7 +59,6 @@ const createCakeBlockChain = () => {
 
   const orderCake = transaction({
     previousTransaction: reserveCakeSlot,
-    creator: userId,
     data: {
       orderId: uuidv4(),
     },
@@ -66,6 +69,7 @@ const createCakeBlockChain = () => {
   console.log('orderCake is valid:', transactionIsValid(orderCake));
 
   const updatedCakeBlock = addTransactionsToBlock({
+    privateKey,
     block: cakeBlock,
     transactions: [configureCake, reserveCakeSlot, orderCake],
   });

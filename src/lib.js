@@ -1,8 +1,15 @@
+const crypto = require('crypto');
+const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const sha3256 = require('js-sha3').sha3_256;
 const MerkleTools = require('merkle-tools');
+const requireText = require('require-text');
 
-const systemName = 'system';
+const systemPrivateKey = {
+  key: requireText('../keys/test-key', require),
+  passphrase: 'block-chain-test',
+};
+const systemPublicKey = { key: requireText('../keys/test-key.pub', require) };
 
 const hashObject = (o) => sha3256(JSON.stringify(o));
 
@@ -11,12 +18,10 @@ const addHashToTransaction = (transaction) => ({
   hash: hashObject(transaction),
 });
 
-const transaction = ({ previousTransaction, creator, data }) => {
+const transaction = ({ previousTransaction, data }) => {
   return addHashToTransaction({
-    id: uuidv4(),
     index: previousTransaction.index + 1,
     timestamp: Date.now(),
-    creator,
     data,
     previousHash: previousTransaction.hash,
   });
@@ -24,23 +29,20 @@ const transaction = ({ previousTransaction, creator, data }) => {
 
 const genesisTransaction = () => {
   return addHashToTransaction({
-    id: uuidv4(),
     index: 0,
     timestamp: Date.now(),
-    creator: systemName,
-    data: { [systemName]: uuidv4() },
+    data: { value: uuidv4() },
     previousHash: '0',
   });
 };
 
 const transactionIsValid = (transaction) => {
-  const { hash: existingHash, id, index, timestamp, creator, data, previousHash } = transaction;
+  const { hash: existingHash, id, index, timestamp, data, previousHash } = transaction;
   return (
     hashObject({
       id,
       index,
       timestamp,
-      creator,
       data,
       previousHash,
     }) === existingHash
@@ -49,7 +51,7 @@ const transactionIsValid = (transaction) => {
 
 const getBlockTransactionsHash = (block) => {
   const merkleTools = new MerkleTools();
-  merkleTools.addLeaves(block.transactions.map(({ hash }) => hash));
+  merkleTools.addLeaves(_.map(block.transactions, 'hash'));
   merkleTools.makeTree();
   return merkleTools.getMerkleRoot().toString('hex');
 };
@@ -62,11 +64,7 @@ const generatedBlockHashIsAcceptable = (hash) => {
 };
 
 const getBlockHashAndNonce = (block) => {
-  const keysToIgnore = { hash: true, nonce: true };
-  const localBlock = Object.keys(block).reduce(
-    (acc, key) => (keysToIgnore[key] ? acc : { ...acc, [key]: block[key] }),
-    { nonce: 0 },
-  );
+  const localBlock = _.assign({ nonce: 0 }, _.omit(block, ['hash', 'nonce', 'signature']));
 
   // this is a proof of work / mining, we ensure that our hash starts with a blockHashDifficulty
   // amount of blockHashLeadingCharacter
@@ -87,27 +85,50 @@ const mineBlock = (block) => {
   return { ...localBlock, ...getBlockHashAndNonce(localBlock) };
 };
 
-const block = (previousBlock) => {
-  return mineBlock({
-    id: uuidv4(),
-    index: previousBlock.index + 1,
-    timestamp: Date.now(),
-    previousHash: previousBlock.hash,
-    transactions: [genesisTransaction()],
-  });
+const signBlock = (privateKey, block) => {
+  const sign = crypto.createSign('SHA256');
+  sign.update(JSON.stringify(_.omit(block, 'creatorPublicKey')));
+  return { ...block, signature: sign.sign(privateKey, 'hex') };
 };
 
-const genesisBlock = () => block({ index: -1, hash: '0', id: uuidv4() });
+const block = (previousBlock, privateKey, creatorPublicKey) => {
+  return signBlock(
+    privateKey,
+    mineBlock({
+      index: previousBlock.index + 1,
+      timestamp: Date.now(),
+      previousHash: previousBlock.hash,
+      creatorPublicKey,
+      transactions: [genesisTransaction()],
+    }),
+  );
+};
+
+const genesisBlock = () => block({ index: -1, hash: '0' }, systemPrivateKey, systemPublicKey);
+
+const blockSignatureIsValid = (block) => {
+  const blockWithoutSignature = _.omit(block, 'signature', 'creatorPublicKey');
+  const verify = crypto.createVerify('SHA256');
+  verify.update(JSON.stringify(blockWithoutSignature));
+  return verify.verify(block.creatorPublicKey, block.signature);
+};
 
 const blockIsValid = (block) => {
   return (
     block.transactionsHash === getBlockTransactionsHash(block) &&
-    getBlockHashAndNonce(block).hash === block.hash
+    getBlockHashAndNonce(block).hash === block.hash &&
+    blockSignatureIsValid(block)
   );
 };
 
-const addTransactionsToBlock = ({ block, transactions }) => {
-  const { index, timestamp, previousHash, transactions: existingTransactions } = block;
+const addTransactionsToBlock = ({ block, privateKey, transactions }) => {
+  const {
+    index,
+    creatorPublicKey,
+    timestamp,
+    previousHash,
+    transactions: existingTransactions,
+  } = block;
 
   const newTransactions = existingTransactions.concat(transactions);
   const invalidTransactions = newTransactions.filter((t) => !transactionIsValid(t));
@@ -115,13 +136,16 @@ const addTransactionsToBlock = ({ block, transactions }) => {
   if (invalidTransactions.length > 0) {
     throw new Error('Invalid transactions found.');
   }
-
-  return mineBlock({
-    index,
-    timestamp,
-    previousHash,
-    transactions: newTransactions,
-  });
+  return signBlock(
+    privateKey,
+    mineBlock({
+      index,
+      creatorPublicKey,
+      timestamp,
+      previousHash,
+      transactions: newTransactions,
+    }),
+  );
 };
 
 const getLatestBlockTransaction = (block) => block.transactions[block.transactions.length - 1];
@@ -134,7 +158,7 @@ const blockChain = () => {
   const ret = { blocks: [genesisBlock()], index: 0 };
   return {
     ...ret,
-    hash: hashBlockChain(ret)
+    hash: hashBlockChain(ret),
   };
 };
 
