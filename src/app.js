@@ -1,7 +1,7 @@
-const { promisify } = require('util');
-const fs = require('fs');
-const uuidv4 = require('uuid/v4');
-const requireText = (name) => fs.readFileSync(require.resolve(name), 'utf8').toString();
+const {promisify} = require('util')
+const fs = require('fs')
+const uuidv4 = require('uuid/v4')
+const requireText = (name) => fs.readFileSync(require.resolve(name), 'utf8').toString()
 
 const {
   block,
@@ -14,19 +14,14 @@ const {
   transactionIsValid,
   blockIsValid,
   chainIsValid,
-} = require('./lib');
+} = require('./lib')
 
-const publicKey = requireText('../keys/test-key.pub');
-const privateKey = {
-  key: requireText('../keys/test-key'),
-  passphrase: 'block-chain-test',
-};
-
-const writeFile = promisify(fs.writeFile);
+const {publicKey, privateKey} = require('./keys')
+const writeFile = promisify(fs.writeFile)
 
 const createCakeBlockChain = () => {
-  const cakeBlockChain = blockChain();
-  const cakeBlock = block(getLatestBlock(cakeBlockChain), privateKey, publicKey);
+  const cakeBlockChain = blockChain()
+  const cakeBlock = block(getLatestBlock(cakeBlockChain), privateKey, publicKey)
 
   const configureCake = transaction({
     previousTransaction: getLatestBlockTransaction(cakeBlock),
@@ -46,7 +41,7 @@ const createCakeBlockChain = () => {
       messageColor: 'white',
       note: 'This is a test note',
     },
-  });
+  })
 
   const reserveCakeSlot = transaction({
     previousTransaction: configureCake,
@@ -55,41 +50,41 @@ const createCakeBlockChain = () => {
       pickupDate: 1532131200000,
       slot: uuidv4(),
     },
-  });
+  })
 
   const orderCake = transaction({
     previousTransaction: reserveCakeSlot,
     data: {
       orderId: uuidv4(),
     },
-  });
+  })
 
-  console.log('configureCake is valid:', transactionIsValid(configureCake));
-  console.log('reserveCakeSlot is valid:', transactionIsValid(reserveCakeSlot));
-  console.log('orderCake is valid:', transactionIsValid(orderCake));
+  console.log('configureCake is valid:', transactionIsValid(configureCake))
+  console.log('reserveCakeSlot is valid:', transactionIsValid(reserveCakeSlot))
+  console.log('orderCake is valid:', transactionIsValid(orderCake))
 
   const updatedCakeBlock = addTransactionsToBlock({
     privateKey,
     block: cakeBlock,
     transactions: [configureCake, reserveCakeSlot, orderCake],
-  });
+  })
 
-  console.log('updatedCakeBlock is valid:', blockIsValid(updatedCakeBlock));
+  console.log('updatedCakeBlock is valid:', blockIsValid(updatedCakeBlock))
 
   const updatedCakeBlockChain = addBlockToChain({
     chain: cakeBlockChain,
     block: updatedCakeBlock,
-  });
+  })
 
-  console.log('updatedCakeBlockChain is valid:', chainIsValid(updatedCakeBlockChain));
+  console.log('updatedCakeBlockChain is valid:', chainIsValid(updatedCakeBlockChain))
 
-  return updatedCakeBlockChain;
+  return updatedCakeBlockChain
 };
 
 (async () => {
-  const cakeBlockChain = createCakeBlockChain();
+  const cakeBlockChain = createCakeBlockChain()
 
-  console.log(JSON.stringify(cakeBlockChain, null, 2));
+  console.log(JSON.stringify(cakeBlockChain, null, 2))
 
-  await writeFile('./cake-block-chain.json', JSON.stringify(cakeBlockChain, null, 2));
-})();
+  await writeFile('./cake-block-chain.json', JSON.stringify(cakeBlockChain, null, 2))
+})()
