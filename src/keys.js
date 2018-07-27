@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIJKAIBAAKCAgEAkvMY1X9VTAmF/97XVfJnqFOwWUXH8mhyHEqb+jT0tyXwhv1a
@@ -50,7 +50,7 @@ Y8cca+J/Ifv1qMGr/GtTkHbc4oGHBZ+xvPIleoNzF6XTNaPSRxc+weY3S636V/Vd
 yGHqZPXJie3X4K25nvBM4pL9fEqGCGv/Llc8Eh67XwIxt43Xf1AInlrqy2dEk0ip
 W+sE5fzZuuSMgZooLXal8/CTjbiutPtgKdD3e/qnHlw38Mc+WisKly6KIG90+7Be
 /Pfj+7e6hponfVpQNMch5sulLYcJYyhLAZcFwP/X5jg1d+u3w2IbCKs1Vok=
------END RSA PRIVATE KEY-----`
+-----END RSA PRIVATE KEY-----`;
 
 const publicKey = `-----BEGIN RSA PUBLIC KEY-----
 MIICCgKCAgEAkvMY1X9VTAmF/97XVfJnqFOwWUXH8mhyHEqb+jT0tyXwhv1akCGS
@@ -64,9 +64,9 @@ WW5VgK5baPZ9/O2ey93w6Zm1GlYF700/6xXaMIcUAoNs+WzFyNNE6GFVUF1Uguq0
 3Wu2R7LOsf0H1MbXKaDK2OyIZagGZ+5PUxhvX4m7mHbts2KiOm2eOjqzO+wO0zub
 uo3JDgsk5yNJDi8pJ4vv6FXIKGDB/lB9TOJ6woz846PKvrjuJZ+jxVQ2rSi7Ql3d
 HFDanI2vIoNiTYxACYvRiGNRFrMJi4NHSZwh9f/m05NBNLvaMH0SAlkCAwEAAQ==
------END RSA PUBLIC KEY-----`
+-----END RSA PUBLIC KEY-----`;
 
 module.exports = {
   publicKey,
   privateKey,
-}
+};
