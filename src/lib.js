@@ -3,7 +3,7 @@ const _ = require('lodash');
 const uuidv4 = require('uuid/v4');
 const sha3256 = require('js-sha3').sha3_256;
 const MerkleTools = require('merkle-tools');
-const { privateKey, publicKey } = require('./keys');
+const { privateKey, publicKey } = require('../common/keys');
 
 const hashObject = (o) => sha3256(JSON.stringify(o));
 

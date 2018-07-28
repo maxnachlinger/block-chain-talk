@@ -1,9 +1,8 @@
-
 const routes = async (fastify, options) => {
   fastify.post('/block', async (request, reply) => {
-    return { hello: 'world' }
-  })
-}
+    return { hello: 'world' };
+  });
+};
 
 /*
 
@@ -23,4 +22,4 @@ def new_transaction():
     return "Success", 201
  */
 
-module.exports = routes
+module.exports = routes;

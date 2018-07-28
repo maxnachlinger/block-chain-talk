@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "fmt": "node_modules/.bin/prettier --write './src/**/*'"
+    "fmt": "node_modules/.bin/prettier --write './**/*.js'"
   },
   "author": "",
   "license": "ISC",

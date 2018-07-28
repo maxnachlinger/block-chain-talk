@@ -15,7 +15,7 @@ const {
   chainIsValid,
 } = require('./lib');
 
-const { publicKey, privateKey } = require('./keys');
+const { publicKey, privateKey } = require('../common/keys');
 const writeFile = promisify(fs.writeFile);
 
 const createCakeBlockChain = () => {
