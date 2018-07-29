@@ -1,8 +1,8 @@
 ## Block-chain intro
 
-### Some concepts first:
+## Some concepts first:
 
-#### Hash function:
+### Hash function:
 
 A hash function takes in arbitrary input and returns a string of a fixed size that's unique to the input.
 
@@ -13,7 +13,7 @@ Hash functions are:
 
 [Hash function example](./examples/0-hash-function.js)
 
-#### Public Key Encryption:
+### Public Key Encryption:
 
 Everyone has 2 keys, a public and a private one
 
@@ -24,7 +24,7 @@ Everyone has 2 keys, a public and a private one
 
 [Public key encryption example](./examples/1-public-key-encryption.js)
 
-### A block
+## A block
 
 A block is a data structure that contains at least:
 
@@ -35,17 +35,18 @@ A block is a data structure that contains at least:
 - A hash of the above
 - A signature of the above + the hash by the owner
 
-### The block chain
+## The block chain
 
-The block chain is the linkage from one block to the previous one via the hash of the previous one.
+The block chain is the linkage between blocks via each block containing a hash of the previous one. The block chain
+starts off with a special block often called a Genesis Block.
 
-### How to add a block to the chain - overview
+## How to add a block to the chain - overview
 
 1.  Get some data, perhaps a set of transactions
 2.  Generate a block for that transaction
 3.  The network determines if the block is part of the authoritative chain
 
-#### 2. Generate a block / Proof of work / mining
+### Generate a block / Proof of work / mining
 
 - Start with a nonce - a number
 - Hash the block
@@ -53,3 +54,23 @@ The block chain is the linkage from one block to the previous one via the hash o
 - If it's not, increment nonce and try again
 
 [Proof of work example](./examples/2-proof-of-work.js)
+
+#### Proof of work benefits:
+
+- It takes a good amount of computation to solve
+- It takes very little computation to verify. Other nodes can verify the validity of the block by checking that the
+  hash of the data of the block is less than a preset number. [Here's an example of block verification](./examples/3-verify-block.js).
+- Security: Let's say a bad actor wants to change a block. This isn't computationally feasible since the bad actor
+  would have to change that block and then change every subsequent block in the chain before the network could generate
+  the next block.
+
+### The network determines if the block is part of the authoritative chain
+
+#### Consensus
+
+Problem: N users can have different "correct" copies of the block-chain.
+
+- Blockchains use consensus algorithms to elect a leader who will decide the contents of the next block. That leader
+  is also responsible for broadcasting the block to the network, so that the other peers can verify the validity of
+  its contents.
+- The consensus (or the single source of truth) is in the blocks at the longest chain.

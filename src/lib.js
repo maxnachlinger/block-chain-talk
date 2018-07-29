@@ -53,30 +53,30 @@ const getBlockTransactionsHash = (block) => {
 const blockHashDifficulty = 4;
 const blockHashLeadingCharacter = '0';
 
-const generatedBlockHashIsAcceptable = (hash) => {
+const blockHashIsAcceptable = (hash) => {
   return hash.startsWith(blockHashLeadingCharacter.repeat(blockHashDifficulty));
 };
 
-const getBlockHashAndNonce = (block) => {
-  const localBlock = _.assign({ nonce: 0 }, _.omit(block, ['hash', 'nonce', 'signature']));
+const addBlockHashAndNonce = (block) => {
+  const localBlock = _.cloneDeep(block);
+  localBlock.nonce = 0;
 
   // this is a proof of work / mining, we ensure that our hash starts with a blockHashDifficulty
   // amount of blockHashLeadingCharacter
   let hash = hashObject(localBlock);
-  while (!generatedBlockHashIsAcceptable(hash)) {
+  while (!blockHashIsAcceptable(hash)) {
     localBlock.nonce++;
     hash = hashObject(localBlock);
   }
 
-  return { nonce: localBlock.nonce, hash };
+  return { ...localBlock, hash };
 };
 
 const mineBlock = (block) => {
-  const localBlock = {
+  return addBlockHashAndNonce({
     ...block,
     transactionsHash: getBlockTransactionsHash(block),
-  };
-  return { ...localBlock, ...getBlockHashAndNonce(localBlock) };
+  });
 };
 
 const signBlock = (privateKey, block) => {
@@ -92,6 +92,10 @@ const verifyBlockSignature = (block) => {
   return verify.verify(block.creatorPublicKey, block.signature, 'hex');
 };
 
+const verifyBlockHash = (block) => {
+  return hashObject(_.omit(block, 'hash', 'signature')) === block.hash;
+};
+
 const block = (previousBlock, privateKey, creatorPublicKey) => {
   return _.flow([mineBlock, _.partial(signBlock, privateKey)])({
     index: previousBlock.index + 1,
@@ -104,11 +108,12 @@ const block = (previousBlock, privateKey, creatorPublicKey) => {
 
 const genesisBlock = () => block({ index: -1, hash: '0' }, privateKey, publicKey);
 
-const blockIsValid = (block) => {
+const blockIsValid = (previousBlock, block) => {
   return (
+    previousBlock.hash === block.previousHash &&
     verifyBlockSignature(block) &&
-    block.transactionsHash === getBlockTransactionsHash(block) &&
-    getBlockHashAndNonce(block).hash === block.hash
+    verifyBlockHash(block) &&
+    blockHashIsAcceptable(block.hash)
   );
 };
 
@@ -139,34 +144,22 @@ const addTransactionsToBlock = ({ block, privateKey, transactions }) => {
 
 const getLatestBlockTransaction = (block) => block.transactions[block.transactions.length - 1];
 
-const hashBlockChain = ({ blocks, index }) => {
-  return hashObject({ blocks, index });
-};
-
-const blockChain = () => {
-  const ret = { blocks: [genesisBlock()], index: 0 };
-  return {
-    ...ret,
-    hash: hashBlockChain(ret),
-  };
-};
+const blockChain = () => ({
+  blocks: [genesisBlock()],
+  index: 0,
+});
 
 const addBlockToChain = ({ chain, block }) => {
-  if (!blockIsValid(block)) {
+  if (!blockIsValid(chain.blocks[chain.index], block)) {
     throw new Error('Invalid block.');
   }
 
   chain.blocks.push(block);
   chain.index = chain.blocks.length - 1;
-  chain.hash = hashBlockChain(chain);
   return chain;
 };
 
 const getLatestBlock = (chain) => chain.blocks[chain.index];
-
-const chainIsValid = (chain) => {
-  return hashBlockChain(chain) === chain.hash;
-};
 
 module.exports = {
   transaction,
@@ -178,5 +171,4 @@ module.exports = {
   addBlockToChain,
   transactionIsValid,
   blockIsValid,
-  chainIsValid,
 };
