@@ -2,17 +2,15 @@
   "name": "block-chain-test",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/lib.js",
   "scripts": {
     "fmt": "node_modules/.bin/prettier --write './**/*.js'"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fastify": "^1.9.0",
     "js-sha3": "^0.7.0",
     "lodash": "^4.17.10",
-    "make-promises-safe": "^1.1.0",
     "merkle-tools": "^1.4.0",
     "uuid": "^3.3.2"
   },
