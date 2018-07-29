@@ -59,7 +59,8 @@ starts off with a special block often called a Genesis Block.
 
 - It takes a good amount of computation to solve, but takes very little computation to verify. Other nodes can verify
   the validity of the block by checking that the hash of the data of the block is less than a preset number.
-  [Here's an example of block verification](./examples/3-verify-block.js).
+  [Here's an example of block verification](./examples/3-verify-block.js). Note: the present number is continually 
+  modified to be harder as more miners join the network.
 - Security: Let's say a bad actor wants to change a block. This isn't computationally feasible since the bad actor
   would have to change that block and then change every subsequent block in the chain before the network could generate
   the next block.
