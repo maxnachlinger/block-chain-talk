@@ -73,7 +73,17 @@ Problem: N users can have different "correct" copies of the block-chain.
 - Blockchains use consensus algorithms to elect a leader who will decide the contents of the next block. That leader
   is also responsible for broadcasting the block to the network, so that the other peers can verify the validity of
   its contents.
-- The consensus (or the single source of truth) is in the blocks at the longest chain.
+- The consensus (or the single source of truth) is in the blocks at the longest chain - or put another way, the chain
+that has the most work put into it.
+
+#### How consensus thwarts sneaky folks:
+Say Alejandro creates a new fraudulent block, and starts broadcasting it. Other miners will continue posting blocks off 
+of the previous block as well. Since our algorithm says we'll ditch chains with fewer blocks, Alejandro will have to 
+continue mining blocks and broadcasting them faster than all the other miners on the network. That would only happen if 
+Alejandro had > 50% of the computing power.
+
+One collorary here is that you shouldn't trust every new block, you should wait for several new blocks to be added after
+it.
 
 ### Proof of Work drawbacks:
 
