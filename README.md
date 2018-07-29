@@ -90,3 +90,6 @@ it.
 
 - Lots of wasted power for mining blocks - I've read the bitcoin mining uses more power than the entire continent of
   Africa.
+
+### Alternative to Proof of Work
+TODO
