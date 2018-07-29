@@ -17,7 +17,7 @@ const signBlock = (privateKey, block) => {
   return { ...block, signature: sign.sign(privateKey, 'hex') };
 };
 
-const blockHashDifficulty = 5;
+const blockHashDifficulty = 4;
 const blockHashLeadingCharacter = '0';
 
 const generatedBlockHashIsAcceptable = (hash) => {
@@ -57,6 +57,6 @@ const createGenesisBlock = (creatorPrivateKey, creatorPublicKey) =>
   });
 
 const genesisBlock = createGenesisBlock(privateKey, publicKey);
-const newBlock = (genesisBlock, privateKey, publicKey, { key: 'value' });
+const newBlock = block(genesisBlock, privateKey, publicKey, { key: 'value' });
 
 console.log(JSON.stringify(newBlock, null, 2));
