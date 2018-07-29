@@ -93,3 +93,6 @@ it.
 
 ### Alternative to Proof of Work
 TODO
+
+### Merkle trees for transactions in blocks
+TODO

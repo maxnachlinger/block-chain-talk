@@ -43,6 +43,8 @@ const transactionIsValid = (transaction) => {
   );
 };
 
+// Using a Merkle tree allows for a quick and simple test of whether a specific
+// transaction is included in the set or not.
 const getBlockTransactionsHash = (block) => {
   const merkleTools = new MerkleTools();
   merkleTools.addLeaves(_.map(block.transactions, 'hash'));
