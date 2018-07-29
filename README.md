@@ -11,7 +11,7 @@ Hash functions are:
 - idempotent, the same input gives you the same output:
 - infeasible to invert
 
-[Here's an example](./examples/0-hash-function.js)
+[Hash function example](./examples/0-hash-function.js)
 
 #### Public Key Encryption:
 
@@ -22,7 +22,7 @@ Everyone has 2 keys, a public and a private one
 
 - Using my private key I can sign a message, anyone can verify my signature with my public key
 
-[Here's an example](./examples/1-public-key-encryption.js)
+[Public key encryption example](./examples/1-public-key-encryption.js)
 
 ### A block
 
@@ -51,4 +51,5 @@ The block chain is the linkage from one block to the previous one via the hash o
 - Hash the block
 - See if the hash is under the current target, a 256-bit number
 - If it's not, increment nonce and try again
-  [Here's an example](./examples/2-proof-of-work.js)
+
+[Proof of work example](./examples/2-proof-of-work.js)
